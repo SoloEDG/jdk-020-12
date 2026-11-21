@@ -1,5 +1,11 @@
 export { initialFlights } from "./model/schedule";
-export { assignStand, departFlight, selectFlight } from "./model/commands";
+export {
+  assignStand,
+  departFlight,
+  requestDeparture,
+  cancelDepartureRequest,
+  selectFlight,
+} from "./model/commands";
 export {
   flightReady,
   turnaroundProgress,

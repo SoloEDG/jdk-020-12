@@ -2,6 +2,7 @@ import type { Shift, ServiceKind } from "../../../shared/types";
 import { copyShift, record } from "../../../shared/document";
 import { serviceBlockReason } from "../lib/eligibility";
 import { serviceCatalog } from "./catalog";
+import { serviceTargetPoint, standById } from "../../tow/lib/tow";
 export function dispatchService(
   state: Shift,
   flightId: string,
@@ -12,7 +13,7 @@ export function dispatchService(
     reason = serviceBlockReason(s, flightId, kind),
     v = s.vehicles.find((x) => x.id === vehicleId),
     f = s.flights.find((x) => x.id === flightId),
-    stand = s.stands.find((x) => x.id === f?.standId),
+    stand = standById(s, f?.locationId),
     task = s.services.find((x) => x.flightId === flightId && x.kind === kind);
   if (
     reason ||
@@ -24,18 +25,26 @@ export function dispatchService(
   ) {
     s.conflicts++;
     s.score -= 10;
-    record(s, reason ?? "车辆不可用或车辆类型不匹配", "warning");
+    record(
+      s,
+      reason ?? "车辆不可用或车辆类型不匹配",
+      "warning",
+    );
     return s;
   }
   task.status = "travel";
   task.vehicleId = v.id;
+  task.pausedReason = undefined;
+  task.resumeDelay = undefined;
   v.status = "travel";
   v.serviceId = task.id;
   v.origin = { ...v.position };
-  v.target = { x: stand.x + 42, y: stand.y + 22 };
+  v.target = serviceTargetPoint(stand, kind);
   v.progress = 0;
-  v.tripDuration =
-    5 + Math.hypot(v.target.x - v.origin.x, v.target.y - v.origin.y) / 50;
+  v.tripDuration = Math.max(
+    3,
+    5 + Math.hypot(v.target.x - v.origin.x, v.target.y - v.origin.y) / 50,
+  );
   record(s, `${v.id} → ${flightId} · ${serviceCatalog[kind].label}`);
   return s;
 }

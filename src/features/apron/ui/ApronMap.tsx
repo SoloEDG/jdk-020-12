@@ -1,13 +1,22 @@
 import type { Shift } from "../../../shared/types";
-import { occupiedFlight, compatibleStand } from "../lib/geometry";
+import { compatibleStand, occupiedFlight } from "../lib/geometry";
+import { towingPosition } from "../../tow/model/engine";
+import { planOccupiesSpot } from "../../tow/lib/tow";
 import { Aircraft } from "./Aircraft";
+
 interface Props {
   state: Shift;
   onStand: (id: string) => void;
   onFlight: (id: string) => void;
 }
+
+function standPoint(state: Shift, id?: string) {
+  return state.stands.find((s) => s.id === id);
+}
+
 export function ApronMap({ state, onStand, onFlight }: Props) {
   const selected = state.flights.find((f) => f.id === state.selectedFlightId);
+  const towPlans = state.towPlans.filter((p) => p.status === "towing");
   return (
     <section className="map-shell">
       <div className="map-toolbar">
@@ -116,10 +125,38 @@ export function ApronMap({ state, onStand, onFlight }: Props) {
             />
           </g>
         ))}
+
+        {towPlans.map((plan) =>
+          plan.legs.map((leg, i) => {
+            const from = standPoint(state, leg.fromId);
+            const to = standPoint(state, leg.toId);
+            if (!from || !to) return null;
+            const active = i === plan.activeLeg;
+            return (
+              <line
+                key={`${plan.id}-${i}`}
+                x1={from.x}
+                y1={from.y}
+                x2={to.x}
+                y2={to.y}
+                stroke={active ? "#cf7b3c" : "#aab4a8"}
+                strokeWidth={active ? 2 : 1}
+                strokeDasharray={active ? "7 6" : "3 7"}
+                opacity={active ? 0.9 : 0.45}
+              />
+            );
+          }),
+        )}
+
         {state.stands.map((stand) => {
           const f = occupiedFlight(state, stand.id),
             active = state.selectedStandId === stand.id;
           const compatible = selected && compatibleStand(stand, selected);
+          const pending = state.towPlans.find(
+            (p) =>
+              (p.status === "waiting" || p.status === "towing") &&
+              planOccupiesSpot(p, stand.id),
+          );
           return (
             <g
               key={stand.id}
@@ -142,7 +179,15 @@ export function ApronMap({ state, onStand, onFlight }: Props) {
                 width="164"
                 height="155"
                 rx="11"
-                fill={active ? "#efc78c" : f ? "#c3ccbf" : "#cfd3c4"}
+                fill={
+                  active
+                    ? "#efc78c"
+                    : f
+                      ? "#c3ccbf"
+                      : stand.kind === "holding"
+                        ? "#cad4d6"
+                        : "#cfd3c4"
+                }
                 fillOpacity={active ? 0.42 : 0.25}
                 stroke={active ? "#cf7b3c" : f ? "#99ac9c" : "#b2b9a7"}
                 strokeWidth={active ? 2 : 1}
@@ -154,15 +199,7 @@ export function ApronMap({ state, onStand, onFlight }: Props) {
                 stroke="#e9c76a"
                 strokeWidth="2"
               />
-              {f ? (
-                <Aircraft
-                  x={stand.x}
-                  y={stand.y - 2}
-                  color={f.color}
-                  wide={f.size === "wide"}
-                  departing={f.status === "departing"}
-                />
-              ) : (
+              {f ? null : (
                 <text
                   x={stand.x}
                   y={stand.y}
@@ -189,6 +226,16 @@ export function ApronMap({ state, onStand, onFlight }: Props) {
               >
                 {stand.id} {stand.size === "wide" ? "W" : ""}
               </text>
+              {stand.kind === "holding" && (
+                <text
+                  x={stand.x}
+                  y={stand.y - 55}
+                  textAnchor="middle"
+                  className="holding-label"
+                >
+                  等待位
+                </text>
+              )}
               {f && (
                 <text
                   x={stand.x}
@@ -197,6 +244,16 @@ export function ApronMap({ state, onStand, onFlight }: Props) {
                   className="plane-label"
                 >
                   {f.id}
+                </text>
+              )}
+              {pending && (
+                <text
+                  x={stand.x}
+                  y={stand.y - 62}
+                  textAnchor="middle"
+                  className="plan-label"
+                >
+                  {pending.status === "waiting" ? "已预留" : "拖入中"}
                 </text>
               )}
               {!f && selected?.status === "incoming" && compatible && (
@@ -210,6 +267,54 @@ export function ApronMap({ state, onStand, onFlight }: Props) {
             </g>
           );
         })}
+
+        {state.flights.map((f) => {
+          if (f.status === "departed" || f.status === "scheduled") return null;
+          if (f.locationId) {
+            const stand = standPoint(state, f.locationId);
+            if (!stand) return null;
+            return (
+              <g
+                key={f.id}
+                className="map-plane"
+                onClick={() => onFlight(f.id)}
+              >
+                <Aircraft
+                  x={stand.x}
+                  y={stand.y - 2}
+                  color={f.color}
+                  wide={f.size === "wide"}
+                  departing={f.status === "departing"}
+                />
+              </g>
+            );
+          }
+          const moving = towingPosition(state, f.id);
+          if (!moving) return null;
+          return (
+            <g
+              key={f.id}
+              className="map-plane towing-plane"
+              onClick={() => onFlight(f.id)}
+            >
+              <Aircraft
+                x={moving.x}
+                y={moving.y}
+                color={f.color}
+                wide={f.size === "wide"}
+              />
+              <text
+                x={moving.x}
+                y={moving.y + 145}
+                textAnchor="middle"
+                className="plane-label"
+              >
+                {f.id} 拖移中
+              </text>
+            </g>
+          );
+        })}
+
         <rect
           x="780"
           y="387"
@@ -266,6 +371,27 @@ export function ApronMap({ state, onStand, onFlight }: Props) {
             )}
           </g>
         ))}
+        {state.towTractors.map((t) => (
+          <g
+            key={t.id}
+            transform={`translate(${t.position.x} ${t.position.y})`}
+            className={`tractor-marker ${t.status}`}
+            data-testid={`tractor-marker-${t.id}`}
+          >
+            <rect
+              x="-9"
+              y="-6"
+              width="18"
+              height="12"
+              rx="2"
+              fill="#3f5b58"
+              stroke="#f4eeda"
+              strokeWidth="1.4"
+            />
+            <circle cx="-4" cy="-5" r="1.6" fill="#f0e4c6" />
+            <circle cx="4" cy="-5" r="1.6" fill="#f0e4c6" />
+          </g>
+        ))}
         <g transform="translate(880 60)">
           <circle r="25" fill="#f3f1e8" fillOpacity=".8" />
           <path d="M0 -17L6 10L0 5L-6 10Z" fill="#334d50" />
@@ -290,6 +416,10 @@ export function ApronMap({ state, onStand, onFlight }: Props) {
         <span>
           <i className="legend-occupied" />
           保障中
+        </span>
+        <span>
+          <i className="legend-holding" />
+          临时等待位
         </span>
         <span>
           <i className="legend-selected" />

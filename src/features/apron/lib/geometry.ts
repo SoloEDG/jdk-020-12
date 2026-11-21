@@ -3,7 +3,12 @@ export function compatibleStand(stand: Stand, flight: Flight): boolean {
   return flight.size === "narrow" || stand.size === "wide";
 }
 export function occupiedFlight(state: Shift, id: string): Flight | undefined {
-  return state.flights.find((f) => f.standId === id && f.status !== "departed");
+  return state.flights.find(
+    (f) => f.locationId === id && f.status !== "departed",
+  );
+}
+export function standById(state: Shift, id?: string): Stand | undefined {
+  return state.stands.find((s) => s.id === id);
 }
 export function interpolate(a: Point, b: Point, t: number): Point {
   return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };

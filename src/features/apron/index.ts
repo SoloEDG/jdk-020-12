@@ -4,6 +4,7 @@ export {
   occupiedFlight,
   selectStand,
   interpolate,
+  standById,
 } from "./lib/geometry";
 export { ApronMap } from "./ui/ApronMap";
 export { StandPicker } from "./ui/StandPicker";

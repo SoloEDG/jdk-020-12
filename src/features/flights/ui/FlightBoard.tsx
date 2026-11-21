@@ -23,42 +23,62 @@ export function FlightBoard({ state, onSelect }: Props) {
         <b>06</b>
       </div>
       <div className="flight-list">
-        {state.flights.map((f) => (
-          <button
-            key={f.id}
-            className={`flight-card ${f.id === state.selectedFlightId ? "selected" : ""} ${f.status === "departed" ? "completed" : ""}`}
-            onClick={() => onSelect(f.id)}
-            data-testid={`flight-${f.id}`}
-          >
-            <div className="flight-top">
-              <span className="airline-mark" style={{ background: f.color }}>
-                ✈
-              </span>
-              <strong>{f.id}</strong>
-              <span className={`status ${f.status}`}>
-                {statusLabels[f.status]}
-              </span>
-            </div>
-            <div className="flight-route">
-              {f.from}
-              <span>→</span>
-              {f.destination.split(" · ")[0]}
-            </div>
-            <div className="flight-meta">
-              <span>
-                {f.aircraft} · {f.passengers} PAX
-              </span>
-              <span>
-                {f.standId ?? "—"} <i /> {clockLabel(f.deadline)}
-              </span>
-            </div>
-            {f.status === "parked" && (
-              <div className="mini-track">
-                <i style={{ width: `${turnaroundProgress(state, f.id)}%` }} />
+        {state.flights.map((f) => {
+          const plan = state.towPlans.find(
+            (p) =>
+              (p.status === "waiting" || p.status === "towing") &&
+              (p.flightId === f.id || p.partnerFlightId === f.id),
+          );
+          return (
+            <button
+              key={f.id}
+              className={`flight-card ${f.id === state.selectedFlightId ? "selected" : ""} ${f.status === "departed" ? "completed" : ""}`}
+              onClick={() => onSelect(f.id)}
+              data-testid={`flight-${f.id}`}
+            >
+              <div className="flight-top">
+                <span className="airline-mark" style={{ background: f.color }}>
+                  ✈
+                </span>
+                <strong>{f.id}</strong>
+                <span className={`status ${f.status}`}>
+                  {statusLabels[f.status]}
+                </span>
               </div>
-            )}
-          </button>
-        ))}
+              <div className="flight-route">
+                {f.from}
+                <span>→</span>
+                {f.destination.split(" · ")[0]}
+              </div>
+              <div className="flight-meta">
+                <span>
+                  {f.aircraft} · {f.passengers} PAX
+                </span>
+                <span>
+                  {f.locationId ?? (f.status === "towing" ? "拖移中" : "—")}{" "}
+                  <i /> {clockLabel(f.deadline)}
+                </span>
+              </div>
+              {plan && (
+                <div className="mini-flag">
+                  {plan.status === "waiting"
+                    ? `拖移待命 · ${plan.toId}`
+                    : `拖移中 · ${plan.legs[plan.activeLeg]?.toId}`}
+                </div>
+              )}
+              {f.departureRequestedAt !== undefined &&
+                f.status !== "departing" &&
+                f.status !== "departed" && (
+                  <div className="mini-flag warn">离港指令排队 · 待停妥</div>
+                )}
+              {f.status === "parked" && (
+                <div className="mini-track">
+                  <i style={{ width: `${turnaroundProgress(state, f.id)}%` }} />
+                </div>
+              )}
+            </button>
+          );
+        })}
       </div>
       <div className="shift-note">
         <span>☀</span>

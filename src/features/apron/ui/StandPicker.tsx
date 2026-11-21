@@ -1,5 +1,6 @@
 import type { Shift } from "../../../shared/types";
 import { compatibleStand, occupiedFlight } from "../lib/geometry";
+import { planOccupiesSpot } from "../../tow/lib/tow";
 export function StandPicker({
   state,
   onAssign,
@@ -12,21 +13,38 @@ export function StandPicker({
   const f = state.flights.find((x) => x.id === state.selectedFlightId);
   if (!f || f.status !== "incoming") return null;
   const valid = state.stands.find((s) => s.id === state.selectedStandId);
+  const reserved = state.towPlans.some(
+    (p) =>
+      (p.status === "waiting" || p.status === "towing") &&
+      state.selectedStandId !== undefined &&
+      planOccupiesSpot(p, state.selectedStandId),
+  );
   return (
     <div className="stand-picker">
       <div className="hint-label">01 / 为航班分配机位</div>
       <div className="stand-choices">
-        {state.stands.map((s) => (
-          <button
-            key={s.id}
-            disabled={!!occupiedFlight(state, s.id) || !compatibleStand(s, f)}
-            className={s.id === state.selectedStandId ? "chosen" : ""}
-            onClick={() => onSelect(s.id)}
-          >
-            {s.id}
-            {s.size === "wide" && <small>W</small>}
-          </button>
-        ))}
+        {state.stands.map((s) => {
+          const holder = occupiedFlight(state, s.id);
+          const usable = s.serviceCapable;
+          return (
+            <button
+              key={s.id}
+              disabled={
+                !!holder || !compatibleStand(s, f) || !usable || reserved
+              }
+              title={
+                !usable ? "临时等待位不能作为进港停靠位" : holder ? `${holder.id} 占用` : ""
+              }
+              className={`${s.id === state.selectedStandId ? "chosen" : ""} ${
+                s.kind === "holding" ? "holding" : ""
+              }`}
+              onClick={() => onSelect(s.id)}
+            >
+              {s.id}
+              {s.size === "wide" && <small>W</small>}
+            </button>
+          );
+        })}
       </div>
       <button
         className="primary full"
@@ -34,7 +52,9 @@ export function StandPicker({
         disabled={
           !valid ||
           !!occupiedFlight(state, valid.id) ||
-          !compatibleStand(valid, f)
+          !compatibleStand(valid, f) ||
+          !valid.serviceCapable ||
+          reserved
         }
         onClick={() => valid && onAssign(valid.id)}
       >

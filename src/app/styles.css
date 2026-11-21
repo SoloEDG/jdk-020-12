@@ -1201,3 +1201,417 @@ footer > span:last-child {
     transition: none !important;
   }
 }
+
+/* ---- towing / repositioning ---- */
+.tow-panel {
+  margin-top: 18px;
+  border-top: 1px solid #e1e4d6;
+  padding-top: 16px;
+}
+.tow-panel .subheading {
+  margin-bottom: 12px;
+}
+.tow-banner {
+  margin: 14px 0 4px;
+  border: 1px solid #e3d3b6;
+  background: #fbf1df;
+  border-radius: 6px;
+  padding: 10px 11px;
+}
+.tow-banner > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.tow-banner strong {
+  font:
+    600 12px "Barlow Condensed",
+    sans-serif;
+  letter-spacing: 0.6px;
+}
+.tow-banner > div > span {
+  font-size: 8px;
+  color: #a4793f;
+}
+.tow-banner p {
+  font-size: 9px;
+  color: #7c6a4c;
+  margin-top: 5px;
+  line-height: 1.6;
+}
+.tow-banner small {
+  display: block;
+  font-size: 8px;
+  color: #a08a63;
+  margin-top: 5px;
+  line-height: 1.6;
+}
+.tow-plan-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 12px;
+}
+.tow-plan-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  border: 1px solid #dde4d6;
+  background: #f4f7ee;
+  border-radius: 5px;
+  padding: 9px 10px;
+}
+.tow-plan-row strong {
+  display: block;
+  font:
+    600 11px "Barlow Condensed",
+    sans-serif;
+  letter-spacing: 0.5px;
+}
+.tow-plan-row > div > span {
+  display: block;
+  font-size: 8px;
+  color: #8c9a86;
+  margin-top: 2px;
+}
+.tow-plan-row small {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 6px;
+}
+.tow-plan-row small i {
+  font-style: normal;
+  font-size: 8px;
+  font-family: monospace;
+  color: #a2ac9a;
+  border: 1px solid #d8dfcf;
+  border-radius: 3px;
+  padding: 1px 3px;
+}
+.tow-plan-row small i.active {
+  color: #b7762f;
+  border-color: #d9b58a;
+  background: #fdf0dc;
+}
+.tow-plan-row small i.done {
+  color: #6f987c;
+  border-color: #bcd3c0;
+}
+.tow-plan-row em {
+  display: block;
+  font-style: normal;
+  font-size: 8px;
+  color: #b17f43;
+  margin-top: 5px;
+}
+.tow-cancel {
+  border: 1px solid #ddd6c6;
+  background: #fbf6ea;
+  color: #9a7b52;
+  border-radius: 4px;
+  font-size: 8px;
+  padding: 5px 7px;
+  white-space: nowrap;
+}
+.tow-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.tow-tabs button {
+  flex: 1;
+  background: #efefe4;
+  border: 1px solid #daddcc;
+  border-radius: 4px;
+  font-size: 9px;
+  padding: 7px 0;
+  color: #7d8a76;
+}
+.tow-tabs button.chosen {
+  border-color: #d49759;
+  background: #f9e7ce;
+  color: #8a5a2b;
+}
+.strategy-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.strategy-row button {
+  text-align: left;
+  background: #f4f3e9;
+  border: 1px solid #dcdccd;
+  border-radius: 5px;
+  padding: 8px 9px;
+}
+.strategy-row button.chosen {
+  border-color: #d49759;
+  background: #fdf3e0;
+}
+.strategy-row strong {
+  display: block;
+  font-size: 9px;
+  font-weight: 500;
+  color: #5f6f5b;
+}
+.strategy-row small {
+  display: block;
+  font-size: 7.5px;
+  line-height: 1.5;
+  color: #9aa38f;
+  margin-top: 3px;
+}
+.tow-targets {
+  margin-bottom: 9px;
+}
+.stand-choices button.holding {
+  background: #e6eef0;
+  border-color: #c5d5d9;
+}
+.stand-choices button.occupied {
+  border-style: dashed;
+}
+.swap-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 9px;
+}
+.swap-choices button {
+  background: #efefe4;
+  border: 1px solid #daddcc;
+  border-radius: 4px;
+  padding: 7px 8px;
+  font:
+    600 10px "Barlow Condensed",
+    sans-serif;
+}
+.swap-choices button small {
+  display: block;
+  font-size: 7px;
+  font-family: monospace;
+  color: #9aa391;
+}
+.swap-choices button.chosen {
+  border-color: #d49759;
+  background: #f9e7ce;
+}
+.swap-choices .tow-note {
+  width: 100%;
+}
+.tow-note {
+  font-size: 8px;
+  line-height: 1.7;
+  color: #929d8b;
+  margin: 6px 0;
+}
+.tow-note.warn {
+  color: #b47c3e;
+}
+.tow-preview {
+  border: 1px solid #d9e2d2;
+  background: #f6f8f0;
+  border-radius: 6px;
+  padding: 10px;
+  margin: 9px 0 10px;
+}
+.tow-preview.blocked {
+  border-color: #e6d3c0;
+  background: #fbf4e9;
+}
+.tow-preview-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: #6d7d68;
+}
+.tow-preview-head em {
+  font-style: normal;
+  font-size: 8px;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+.tow-preview-head em.ok {
+  background: #e3efdf;
+  color: #5b8a68;
+}
+.tow-preview-head em.warn {
+  background: #f2ddc2;
+  color: #a46f35;
+}
+.tow-route {
+  margin: 8px 0 6px;
+  padding-left: 16px;
+  font-size: 8.5px;
+  color: #71806c;
+  line-height: 1.8;
+}
+.tow-route small {
+  margin-left: 6px;
+  font-family: monospace;
+  color: #9aa58f;
+}
+.tow-wait {
+  font-size: 8.5px;
+  color: #ad7433;
+  line-height: 1.7;
+  margin: 4px 0;
+}
+.tow-impacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 6px 0;
+}
+.tow-impacts span {
+  font-size: 7.5px;
+  border-radius: 3px;
+  padding: 2px 5px;
+  border: 1px solid #d7ddcb;
+  color: #7f8b75;
+  background: #f1f3e9;
+}
+.tow-impacts .follow {
+  color: #4f8575;
+  border-color: #c0d8cf;
+  background: #eaf4ef;
+}
+.tow-impacts .pause {
+  color: #a4712f;
+  border-color: #e4d0b3;
+  background: #fbf2e3;
+}
+.tow-impacts .reconnect {
+  color: #9a6a44;
+  border-color: #e2c9b5;
+  background: #faf0e8;
+}
+.tow-impacts .invalidate {
+  color: #a24f43;
+  border-color: #e2c2bb;
+  background: #fbecea;
+}
+.tow-impacts .safe {
+  color: #648472;
+  border-color: #cbdccc;
+  background: #eef5ec;
+}
+.tow-impacts .muted {
+  border: 0;
+  background: none;
+  color: #9ca692;
+  padding: 0;
+}
+.tow-cost {
+  font-size: 8px;
+  line-height: 1.7;
+  color: #8a7b5e;
+  margin: 5px 0;
+}
+.tow-blockers {
+  margin: 6px 0 0;
+  padding-left: 15px;
+  font-size: 8px;
+  color: #ad6f38;
+  line-height: 1.7;
+}
+.tow-create {
+  margin-top: 2px;
+}
+.tow-history {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 8px;
+  font-size: 7.5px;
+  color: #97a18e;
+}
+.tow-history .cancelled {
+  color: #b09272;
+}
+.service-flag {
+  font-size: 12px;
+  color: #b58a4d;
+}
+.service-task.paused .service-title strong {
+  color: #a3793f;
+}
+.task-track.paused i {
+  background: #d3b381;
+}
+button.secondary.full {
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+.fleet-panel .tractor-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.tractor-chip {
+  font-size: 8px;
+  border: 1px solid #d5ddcd;
+  border-radius: 4px;
+  padding: 4px 7px;
+  color: #7f8c78;
+  background: #f4f6ec;
+}
+.tractor-chip.towing {
+  border-color: #d9b58a;
+  background: #fdf0dc;
+  color: #a2793c;
+}
+.mini-flag {
+  margin-top: 8px;
+  font-size: 7.5px;
+  letter-spacing: 0.3px;
+  color: #7c8f9a;
+  border-top: 1px dashed #dde1d4;
+  padding-top: 6px;
+}
+.mini-flag.warn {
+  color: #b47c3e;
+}
+.holding-label {
+  fill: #7e949a;
+  font:
+    500 9px "Barlow Condensed",
+    sans-serif;
+  letter-spacing: 1px;
+}
+.plan-label {
+  fill: #b07a3d;
+  font:
+    500 9px "Barlow Condensed",
+    sans-serif;
+  letter-spacing: 1px;
+}
+.map-legend .legend-holding {
+  background: #c5d5d9;
+  border-color: #a9bdc3;
+}
+.map-plane {
+  cursor: pointer;
+}
+.towing-plane .plane-arriving,
+.towing-plane .plane-departing {
+  animation: none;
+}
+.tractor-marker.towing {
+  filter: drop-shadow(0 0 4px #d6a464);
+}
+.tractor-marker polygon {
+  fill: #3f5b58;
+}
+@media (max-width: 1180px) {
+  .tow-panel {
+    grid-column: 1;
+  }
+}

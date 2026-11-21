@@ -19,6 +19,7 @@ export const statusLabels: Record<Flight["status"], string> = {
   scheduled: "计划到达",
   incoming: "等待机位",
   parked: "地勤保障",
+  towing: "拖移中",
   departing: "正在推出",
   departed: "已离港",
 };

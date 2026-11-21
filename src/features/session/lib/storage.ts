@@ -1,6 +1,8 @@
 import type { Shift } from "../../../shared/types";
 import { validShift } from "./validation";
-const key = "apron07-shift-v1";
+// Version 2 adds towing plans and holding spots; older saves are rejected by
+// validShift rather than being silently misread.
+const key = "apron07-shift-v2";
 export function saveShift(state: Shift): void {
   localStorage.setItem(key, JSON.stringify(state));
 }

@@ -4,6 +4,11 @@ import { ApronMap, selectStand } from "../features/apron";
 import { FleetPanel, selectVehicle } from "../features/fleet";
 import { dispatchService } from "../features/services";
 import {
+  planRelocate,
+  planSwap,
+  requestCancelPlan,
+} from "../features/tow";
+import {
   SessionBar,
   ScoreStrip,
   changeSpeed,
@@ -86,11 +91,22 @@ export function App() {
             onDispatch={(kind, id) =>
               setState((s) => dispatchService(s, s.selectedFlightId, kind, id))
             }
+            onRelocate={(flightId, standId, strategy) =>
+              setState((s) => planRelocate(s, flightId, standId, strategy))
+            }
+            onSwap={(flightId, partnerId, strategy) =>
+              setState((s) => planSwap(s, flightId, partnerId, strategy))
+            }
+            onCancelPlan={(planId) =>
+              setState((s) => requestCancelPlan(s, planId))
+            }
           />
         </div>
         <footer>
           <span>APRON 07 · 地面有序，天空自由。</span>
-          <span>操作提示：选择航班 → 分配机位 → 派遣车辆 → 批准离港</span>
+          <span>
+            操作提示：选择航班 → 分配机位 → 派遣车辆 → 批准离港 · 停靠后可拖移 / 换位
+          </span>
           <span>
             <i className="live-dot" />
             {state.paused ? "SIMULATION PAUSED" : "SIMULATION LIVE"}

@@ -1,6 +1,7 @@
 import type { ServiceKind, Shift } from "../../../shared/types";
 import { serviceCatalog } from "../model/catalog";
 import { serviceBlockReason } from "../lib/eligibility";
+import { serviceStatusLabel } from "../../tow/lib/tow";
 export function ServicePanel({
   state,
   onDispatch,
@@ -26,6 +27,7 @@ export function ServicePanel({
         const selected =
           state.vehicles.find((v) => v.id === state.selectedVehicleId) ??
           available[0];
+        const vehicle = state.vehicles.find((v) => v.id === t.vehicleId);
         return (
           <div className={`service-task ${t.status}`} key={t.id}>
             <div className="service-icon">
@@ -41,20 +43,37 @@ export function ServicePanel({
                       ? `${Math.floor(t.progress)}%`
                       : t.status === "travel"
                         ? "车辆前往中"
-                        : `0${i + 1}`}
+                        : t.status === "paused"
+                          ? "已暂停"
+                          : `0${i + 1}`}
                 </span>
               </div>
               <div className="service-detail">
                 {t.status === "pending"
                   ? (reason ??
                     `${selected?.id ?? "暂无空闲车辆"} · ${Math.round(t.duration)}s`)
-                  : t.vehicleId + " · " + info.english}
+                  : t.status === "paused"
+                    ? (t.pausedReason ?? "等待飞机停妥")
+                    : `${t.vehicleId} · ${info.english}`}
               </div>
               {(t.status === "working" || t.status === "done") && (
                 <div className="task-track">
                   <i style={{ width: `${t.progress}%` }} />
                 </div>
               )}
+              {t.status === "paused" && (
+                <div className="task-track paused">
+                  <i style={{ width: `${t.progress}%` }} />
+                </div>
+              )}
+              {vehicle &&
+                (t.status === "paused" || t.status === "working") &&
+                vehicle.holdSeconds !== undefined &&
+                vehicle.holdSeconds > 0 && (
+                  <div className="service-detail">
+                    重新连接中 · 约 {Math.ceil(vehicle.holdSeconds)}s
+                  </div>
+                )}
             </div>
             {t.status === "pending" && (
               <button
@@ -67,11 +86,17 @@ export function ServicePanel({
                 派遣 ↗
               </button>
             )}
+            {t.status === "paused" && (
+              <span className="service-flag" title={serviceStatusLabel(t.status)}>
+                ⏸
+              </span>
+            )}
           </div>
         );
       })}
       <p className="dependency-note">
-        ↳ 先完成行李装卸，再进行客舱清洁。燃油可同步保障。
+        ↳ 先完成行李装卸，再进行客舱清洁。燃油可同步保障。拖移时：在途车辆跟随，
+        正在作业的暂停或重新连接，已完成成果保留。
       </p>
     </div>
   );

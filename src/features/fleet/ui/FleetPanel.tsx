@@ -7,10 +7,12 @@ export function FleetPanel({
   state: Shift;
   onSelect: (id: string) => void;
 }) {
-  const labels = {
+  const labels: Record<string, string> = {
     idle: "待命",
     travel: "前往机位",
     working: "作业中",
+    relocating: "驶向新位置",
+    paused: "原地等待",
     returning: "返回车场",
   };
   return (
@@ -53,6 +55,25 @@ export function FleetPanel({
           </button>
         ))}
       </div>
+      {state.towTractors.length > 0 && (
+        <div className="tractor-row">
+          <span className="eyebrow">TOW TRACTORS</span>
+          {state.towTractors.map((t) => (
+            <span
+              key={t.id}
+              className={`tractor-chip ${t.status}`}
+              data-testid={`tractor-${t.id}`}
+            >
+              ⛭ {t.id} ·{" "}
+              {t.status === "idle"
+                ? "待命"
+                : t.status === "towing"
+                  ? "拖移中"
+                  : "回车场"}
+            </span>
+          ))}
+        </div>
+      )}
     </section>
   );
 }
